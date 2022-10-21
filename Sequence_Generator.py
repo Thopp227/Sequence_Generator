@@ -26,15 +26,21 @@ class TopoPhaseTracker:
         return self._phases[self._phase]
 
 # Calls the Seqgenerator class and allows for user input of variables, this class object is initialized with these values "Kimosabi"
+
+
 class SequenceGenerator:
     # Dictionary of Topos mapped to corresponding binary , shared across all classes Technically a self variable
     topo_binary = dict(Topo1="00", Topo2="00", Topo3="01", Topo4="01", Topo5="10", Topo6="10", Topo7="11", Topo8="11")
+    row_letter = dict(A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7)
+    row_converted = ()
 
-    def __init__(self, rounds, num_sequences, topo_sequence_input,topo_sequence):
+    def __init__(self, rounds, num_sequences, topo_sequence_input,topo_sequence ,row ,column):
         self.rounds = rounds
         self.num_sequences = num_sequences
         self.topo_sequence_input = topo_sequence_input
         self.topo_sequence = topo_sequence
+        self.row = row
+        self.column = column
 
     def info(self):
         print(f'rounds,num_seq,Topoinput,toposeq: {rounds,num_sequences,topo_sequence_input,topo_sequence}')
@@ -42,6 +48,12 @@ class SequenceGenerator:
     def convert(self):
         final_sequence = []
         non_sep_seq = []
+
+#Takes in the users row in a-h format and places it in the corresponding row in excel 0-7
+    def row_convert(self):
+        print(self.row)
+        self.row_converted = self.row_letter[self.row]
+        print(self.row_converted)
 
 #Uncomment to see what all the passed in variables are
         #self.info()
@@ -75,16 +87,17 @@ class SequenceGenerator:
             final_sequence.append(generated_sequence)
             counter += self.rounds
 
-
         # Exporting to Excel sheet
         excel_data = pd.DataFrame(final_sequence)
-        # populates custom_sequence sheet in local python/projects directory
-        excel_data.to_excel('./custom_sequence.xlsx', sheet_name='Test Case 1', header=False, index=False)
+        # populates custom_sequence sheet in local python/projects directory with user inputs of column and row
+        excel_data.to_excel('./custom_sequence.xlsx', sheet_name='Test Case 1', header=False, index=False, startcol=self.column,startrow=self.row_converted)
         print(excel_data)
 
-# outside the above class function
-if __name__ == "__main__":
 
+# outside the above class function
+
+
+if __name__ == "__main__": 
     # Dictionary of Topos mapped to corresponding binary
     topo_binary = dict(Topo1="00", Topo2="00", Topo3="01", Topo4="01", Topo5="10", Topo6="10", Topo7="11", Topo8="11")
     #lists variables to be populated
@@ -106,7 +119,14 @@ if __name__ == "__main__":
         topo_sequence_input = str(input())
         topo_list = topo_sequence_input.split(',')
         topo_sequence.append(topo_list)
-    print(topo_sequence)
-    #Calls the Seqgenerator class and allows for user input of variables, this class object is initialized with these values "Kimosabi"  object that you created
-    seq = SequenceGenerator(rounds, num_sequences, topo_sequence_input, topo_sequence)
+    #asks the user what column they want to populate and what row they want to start on
+    print("Input Starting Column: ")
+    column = int(input())-1
+    print("Input Starting Row: ")
+    row = str(input())
+    row = row.upper()
+
+    #Calls the Sequence generator class and allows for user input of variables, this class object is initialized with these values "Kimosabi"  object that you created
+    seq = SequenceGenerator(rounds, num_sequences, topo_sequence_input, topo_sequence, row, column)
     seq.convert()
+    seq.row_convert()
